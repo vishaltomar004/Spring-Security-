@@ -6,6 +6,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -13,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf( customizer -> customizer.disable());
+        http.csrf(customizer -> customizer.disable());
         http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
 //        http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
@@ -22,10 +26,28 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 
-
         // BDS nehind the scenes
 
 
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+
+        UserDetails user1 = User
+                .withDefaultPasswordEncoder()
+                .username("V")
+                .password("123")
+                .roles("USER")
+                .build();
+
+        UserDetails user2 = User
+                .withDefaultPasswordEncoder()
+                .username("S")
+                .password("1234")
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user1, user2);
     }
 }
